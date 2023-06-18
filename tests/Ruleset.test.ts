@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { IHitStatistics, IScoreInfo, ScoreInfo } from 'osu-classes';
+import { HitResult, HitStatistics, IScoreInfo, ScoreInfo } from 'osu-classes';
 import { BeatmapDecoder } from 'osu-parsers';
 import { ITestAttributes, IModdedAttributes } from './Attributes';
 import {
@@ -25,7 +25,7 @@ function testRuleset(rulesetName: string): void {
   testBeatmaps(rulesetPath);
 }
 
-function testBeatmaps(rulesetPath: string): void {
+async function testBeatmaps(rulesetPath: string): Promise<void> {
   const beatmapsPath = path.resolve(rulesetPath, './Beatmaps');
   const beatmapFiles = fs.readdirSync(beatmapsPath);
 
@@ -37,7 +37,7 @@ function testBeatmaps(rulesetPath: string): void {
     const attributesData = fs.readFileSync(attributesPath).toString();
     const attributes: IModdedAttributes = JSON.parse(attributesData);
 
-    const decoded = decoder.decodeFromPath(beatmapPath, false);
+    const decoded = await decoder.decodeFromPath(beatmapPath, false);
 
     for (const acronym in attributes) {
       const mods = ruleset.createModCombination(acronym);
@@ -88,7 +88,7 @@ function simulateScore(beatmap: CatchBeatmap, attributes: CatchDifficultyAttribu
   });
 }
 
-function getStatistics(beatmap: CatchBeatmap): Partial<IHitStatistics> {
+function getStatistics(beatmap: CatchBeatmap): HitStatistics {
   const nestedFruits = beatmap.hitObjects.reduce((f, h) => {
     const nested = h.nestedHitObjects;
 
@@ -107,9 +107,9 @@ function getStatistics(beatmap: CatchBeatmap): Partial<IHitStatistics> {
     }, 0);
   }, 0);
 
-  return {
-    great: beatmap.fruits + nestedFruits,
-    largeTickHit: tickHit - smallTickHit,
-    smallTickHit,
-  };
+  return new HitStatistics([
+    [HitResult.Great, beatmap.fruits.length + nestedFruits],
+    [HitResult.LargeTickHit, tickHit - smallTickHit],
+    [HitResult.SmallTickHit, smallTickHit],
+  ]);
 }
