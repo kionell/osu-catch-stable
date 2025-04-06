@@ -1,6 +1,7 @@
 {
   "name": "osu-catch-stable",
-  "version": "4.0.0",
+  "type": "module",
+  "version": "4.0.1",
   "description": "osu!stable version of osu!catch ruleset based on osu!lazer source code.",
   "exports": {
     "import": {
@@ -49,6 +50,7 @@
     "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-node-externals": "^8.0.0",
     "ts-jest": "^29.3.1",
+    "ts-node": "^10.9.2",
     "typedoc": "^0.28.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.29.0"
